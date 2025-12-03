@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25
+pragma solidity >=0.5.0 <0.6.0;
 
 contract ZombieFactory{
     uint dnaDigit = 16;
@@ -18,6 +18,8 @@ contract ZombieFactory{
 
     function _createZombie(string _name, uint _dna) private {
         uint id = zombies.push(Zombie(_name, _dna)) - 1;
+        zombieToOwner[id] = msg.sender; // In Solidity, there are certain global variables that are available to all functions. One of these is msg.sender, which refers to the address of the person (or smart contract) who called the current function.
+        ownerZombieCount[msg.sender]++;
         emit NewZombie(id,_dna,_name);
     }
 
@@ -27,7 +29,13 @@ contract ZombieFactory{
     }
 
     function createRandomZombie(string _name) public{
+        require(ownerZombieCount[msg.sender] == 0); // require to make sure this function only gets executed one time per user, when they create their first zombie.
         uint randDna = _generateRandomDna(_name);
         _createZombie(_name, randDna);
     } 
+}
+
+contract ZombieFeeding is ZombieFactory{ // Inheritance
+
+
 }
